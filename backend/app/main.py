@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.schemas.product import ProductCreate, ProductOut
 from app.schemas.user import UserCreate, UserOut
 from app.models.user import User
+from app.utils.security import hash_password
 
 app = FastAPI()
 
@@ -28,7 +29,8 @@ def add_new_product(product: ProductCreate, db:Session = Depends(get_db)):
 
 @app.post("/users", response_model=UserOut)
 def create_user(user: UserCreate, db:Session=Depends(get_db)):
-    new_user = User(email=user.email, password= user.password)
+    hash_pwd = hash_password(user.password)
+    new_user = User(email=user.email, password= hash_pwd)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
