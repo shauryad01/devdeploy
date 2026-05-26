@@ -1,21 +1,19 @@
 package db
 
 import (
-	"log"
-
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-func connect(connectionString string) {
+func Connect(connectionString string) (*sqlx.DB, error) {
 	db, err := sqlx.Open("postgres", connectionString)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	defer db.Close()
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
+	return db, nil
 }
