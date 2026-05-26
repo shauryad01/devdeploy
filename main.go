@@ -16,5 +16,6 @@ func main() {
 			"message": "pong",
 		})
 	})
+	connect()
 	r.Run(":8000")
 }
