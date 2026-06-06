@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	"github.com/shauryad01/devdeploy/db"
 )
@@ -34,6 +35,9 @@ func main() {
 		log.Fatal("database connection failed: ", err)
 	}
 	log.Println("database connected:", conn.Stats())
+
+	jobs := make(chan int, 100)
+	go worker(jobs, conn)
 
 	r := gin.Default()
 
@@ -71,7 +75,7 @@ func main() {
 			})
 			return
 		}
-
+		jobs <- d.ID
 		c.JSON(http.StatusCreated, d)
 	})
 
@@ -99,4 +103,10 @@ func main() {
 
 	})
 	r.Run(":8000")
+}
+
+func worker(jobs chan int, db *sqlx.DB) {
+	for id := range jobs {
+		fmt.Printf("processing %d", id)
+	}
 }
